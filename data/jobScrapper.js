@@ -18,6 +18,7 @@ async function scrapeJobs() {
         response.on("end", () => {
           const $ = cheerio.load(data);
           const jobs = [];
+          const trends = [];
 
           $("article.jeg_post").each((index, element) => {
             const img = $(element).find(".jeg_thumb img").attr("src");
@@ -28,10 +29,17 @@ async function scrapeJobs() {
             jobs.push({ id, img, title, date });
           });
 
-          const jobsJSON = { jobs };
+          $("div.jeg_news_ticker_item").each((index, element) => {
+            const title = $(element).find("span:first-child a").text();
+            const date = $(element).find("span.post-date").text();
+
+            trends.push({ title, date });
+          });
+
+          const jobsJSON = { jobs, trends };
           const jsonData = JSON.stringify(jobsJSON, null, 2);
 
-          fs.writeFile("jobs.json", jsonData, (err) => {
+          fs.writeFile("data.json", jsonData, (err) => {
             if (err) throw err;
             console.log("Data has been written to jobs.json");
           });
