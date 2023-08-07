@@ -36,19 +36,6 @@
 
  
 
-  // Carousel item 1
-  $(".carousel-item-1").owlCarousel({
-    autoplay: true,
-    smartSpeed: 1500,
-    items: 1,
-    dots: false,
-    loop: true,
-    nav: true,
-    navText: [
-      '<i class="fa fa-angle-left" aria-hidden="true"></i>',
-      '<i class="fa fa-angle-right" aria-hidden="true"></i>',
-    ],
-  });
 
   // Carousel item 2
   $(".carousel-item-2").owlCarousel({

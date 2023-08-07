@@ -21,7 +21,27 @@ async function scrapeJobs() {
           const trends = [];
 
           $("article.jeg_post").each((index, element) => {
-            const img = $(element).find(".jeg_thumb img").attr("src");
+            const img = {};
+            const src = $(element).find(".jeg_thumb img").attr("src");
+            const alt = $(element).find(".jeg_thumb img").attr("alt");
+            const decoding = $(element).find(".jeg_thumb img").attr("decoding");
+            const dataSrc = $(element).find(".jeg_thumb img").attr("data-src");
+            const dataSrcSet = $(element)
+              .find(".jeg_thumb img")
+              .attr("data-srcset");
+            const dataLazyLoaded = $(element)
+              .find(".jeg_thumb img")
+              .attr("data-lazy-loaded");
+            const loading = $(element).find(".jeg_thumb img").attr("loading");
+
+            img.src = src;
+            img.alt = alt;
+            img.decoding = decoding;
+            img.dataSrc = dataSrc;
+            img.dataSrcSet = dataSrcSet;
+            img.dataLazyLoaded = dataLazyLoaded;
+            img.loading = loading;
+
             const title = $(element).find(".jeg_post_title a").text();
             const date = $(element).find(".jeg_meta_date a").text();
             const id = uuidv4(); // Generate a random unique ID
