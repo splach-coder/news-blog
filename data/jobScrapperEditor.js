@@ -67,8 +67,35 @@ fs.readFile(
 );
 
 function filterHTML(htmlCode) {
+  const cheerio = require("cheerio");
+
   // Load the HTML code using Cheerio
   const $ = cheerio.load(htmlCode);
+
+   // Filter p tags with span and strong elements
+   $("p[style*='text-align: justify;'] span").each((index, spanElement) => {
+    const span = $(spanElement);
+    
+    // Remove only the font-family style attribute
+    const currentStyle = span.attr('style');
+    const newStyle = currentStyle.replace(/font-family\s*:[^;]*;?/i, '');
+
+    span.attr('style', newStyle);
+
+    const strongTag = span.find('strong');
+    if (strongTag.length > 0) {
+      const content = strongTag.text().trim();
+      const isArabicLang = isArabic(content);
+      
+      // Set text-align based on language
+      const parentP = span.closest('p');
+      if (isArabicLang) {
+        parentP.css('text-align', 'right');
+      } else {
+        parentP.css('text-align', 'left');
+      }
+    }
+  });
 
   // Filter images
   $("img").each((index, element) => {
@@ -82,18 +109,13 @@ function filterHTML(htmlCode) {
     const href = $(element).attr("href");
     if (
       !href ||
-      !href.startsWith("https") ||
-      href.includes("alwadifa-club.com")
+      (!href.startsWith("https") && href.includes("alwadifa-club.com"))
     ) {
       const parent = $(element).parent();
       if (parent.is("p")) {
         parent.remove(); // Remove the parent <p> tag
       } else if (parent.parent().is("p")) {
         parent.parent().remove(); // Remove the grandparent <p> tag
-      } else if (parent.parent().parent().is("p")) {
-        parent.parent().parent().remove(); // Remove the grandparent <p> tag
-      } else if (parent.parent().parent().parent().is("p")) {
-        parent.parent().parent().parent().remove(); // Remove the grandparent <p> tag
       }
     }
   });
@@ -103,4 +125,10 @@ function filterHTML(htmlCode) {
 
   // Return the filtered HTML code
   return $.html();
+}
+
+function isArabic(text) {
+  // Regular expression to match Arabic characters
+  const arabicPattern = /[\u0600-\u06FF]/;
+  return arabicPattern.test(text);
 }
