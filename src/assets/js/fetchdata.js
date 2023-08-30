@@ -2,33 +2,103 @@
   "use strict";
 
   $(document).ready(function () {
+    //gets the breaking news from the server
     $.ajax({
-      url: "./data/data.json",
+      url: "../controller/breakingnews.php",
       type: "GET",
       dataType: "json",
       success: function (data) {
-        // 'data' contains the JSON data retrieved from the server
-        const trends = data.trends;
-        const jobs = data.jobs;
-
-        console.log(jobs);
-
         $(".tranding-carousel").empty();
-        $(".owl-carousel.carousel-item-1").empty();
-        $(".owl-carousel.carousel-item-3").empty();
-        $(".owl-carousel.carousel-item-4").empty();
-        $(".owl-carousel.carousel-item-2").empty();
 
-        $(trends).each(function () {
+        $(data).each(function () {
           const title = $(this)[0].title;
+          const id = $(this)[0].id;
+
           $(".tranding-carousel").append(
             `
                 <div class="text-truncate">
-                    <a class="text-secondary" href=""> ${title}</a>
+                    <a class="text-secondary" href="../views/single.php?id=${id}"> ${title}</a>
                 </div>
                 `
           );
         });
+
+        // Tranding carousel
+        $(".tranding-carousel").owlCarousel({
+          autoplay: true,
+          smartSpeed: 2000,
+          items: 1,
+          dots: false,
+          loop: true,
+          nav: true,
+          navText: [
+            '<i class="fa fa-angle-left"></i>',
+            '<i class="fa fa-angle-right"></i>',
+          ],
+        });
+      },
+      error: function (xhr, status, error) {
+        console.error("Error fetching JSON data:", status, error);
+      },
+    });
+
+    //get the tags from the server
+    $.ajax({
+      url: "../controller/tags.php",
+      type: "GET",
+      dataType: "json",
+      success: function (data) {
+        $(".tags-con").empty();
+
+        $(data).each(function () {
+          console.log($(this));
+          const title = $(this)[0].name;
+          const id = $(this)[0].id;
+
+          $(".tags-con").append(
+            `<a href="" data-id="${id}" class="btn btn-sm btn-outline-secondary m-1">${title}</a>`
+          );
+        });
+      },
+      error: function (xhr, status, error) {
+        console.error("Error fetching JSON data:", status, error);
+      },
+    });
+
+    //get the categories from the server
+    $.ajax({
+      url: "../controller/categories.php",
+      type: "GET",
+      dataType: "json",
+      success: function (data) {
+        $(".categories-con").empty();
+
+        $(data).each(function () {
+          const title = $(this)[0].name;
+          const id = $(this)[0].id;
+
+          $(".categories-con").append(
+            `<a href="" data-id="${id}" class="btn btn-sm btn-outline-secondary m-1">${title}</a>`
+          );
+        });
+      },
+      error: function (xhr, status, error) {
+        console.error("Error fetching JSON data:", status, error);
+      },
+    });
+
+    $.ajax({
+      url: "../data/data.json",
+      type: "GET",
+      dataType: "json",
+      success: function (data) {
+        // 'data' contains the JSON data retrieved from the server
+        const jobs = data.jobs;
+
+        $(".owl-carousel.carousel-item-1").empty();
+        $(".owl-carousel.carousel-item-3").empty();
+        $(".owl-carousel.carousel-item-4").empty();
+        $(".owl-carousel.carousel-item-2").empty();
 
         $(jobs).each(function () {
           const id = $(this)[0].id;
@@ -46,9 +116,9 @@
                         <div class="mb-1">
                             <a class="text-white" href="">عمل</a>
                             <span class="px-2 text-white">/</span>
-                            <a class="text-white" href="single.html?id=${id}">${date}</a>
+                            <a class="text-white" href="single.php?id=${id}">${date}</a>
                         </div>
-                        <a class="h2 m-0 text-white font-weight-bold" href="single.html?id=${id}">${title}</a>
+                        <a class="h2 m-0 text-white font-weight-bold" href="single.php?id=${id}">${title}</a>
                     </div>
               </div>
                   `
@@ -59,11 +129,15 @@
               <div class="d-flex">
                 <img
                 src="${img.dataSrc}"
-                alt="${img.alt}" decoding="${img.decoding}" data-src="${img.dataSrc}" data-srcset="${img.dataSrcSet}" data-lazy-loaded="${img.dataLazyLoaded}" loading="${img.loading}"
+                alt="${img.alt}" decoding="${img.decoding}" data-src="${
+                img.dataSrc
+              }" data-srcset="${img.dataSrcSet}" data-lazy-loaded="${
+                img.dataLazyLoaded
+              }" loading="${img.loading}"
                 style="width: 80px; height: 80px; object-fit: cover" />
                 <div class="d-flex align-items-center bg-light px-3" style="height: 80px">
-                <a class="text-secondary font-weight-semi-bold" href="single.html?id=${id}">
-                ${title} </a>
+                <a class="text-secondary font-weight-semi-bold" href="single.php?id=${id}">
+                ${truncateWordsAndAddEllipsis(title, 6)} </a>
               </div>
             </div>
               `
@@ -73,14 +147,21 @@
               `
               <div class="position-relative overflow-hidden" style="height: 300px">
                   <img class="img-fluid w-100 h-100" src="${img.dataSrc}"
-                  alt="${img.alt}" decoding="${img.decoding}" data-src="${img.dataSrc}" data-srcset="${img.dataSrcSet}" data-lazy-loaded="${img.dataLazyLoaded}" loading="${img.loading}" style="object-fit: cover" />
+                  alt="${img.alt}" decoding="${img.decoding}" data-src="${
+                img.dataSrc
+              }" data-srcset="${img.dataSrcSet}" data-lazy-loaded="${
+                img.dataLazyLoaded
+              }" loading="${img.loading}" style="object-fit: cover" />
                   <div class="overlay">
                     <div class="mb-1" style="font-size: 13px">
                       <a class="text-white" href="">عمل</a>
                       <span class="px-1 text-white">/</span>
-                      <a class="text-white" href="single.html?id=${id}">${date}</a>
+                      <a class="text-white" href="single.php?id=${id}">${date}</a>
                     </div>
-                    <a class="h4 m-0 text-white" href="single.html?id=${id}">${title}</a>
+                    <a class="h4 m-0 text-white" href="single.php?id=${id}">${truncateWordsAndAddEllipsis(
+                title,
+                6
+              )}</a>
                     </div>
               </div>
               `
@@ -92,7 +173,11 @@
                 <img
                   class="img-fluid w-100"
                   src="${img.dataSrc}"
-                  alt="${img.alt}" decoding="${img.decoding}" data-src="${img.dataSrc}" data-srcset="${img.dataSrcSet}" data-lazy-loaded="${img.dataLazyLoaded}" loading="${img.loading}" 
+                  alt="${img.alt}" decoding="${img.decoding}" data-src="${
+                img.dataSrc
+              }" data-srcset="${img.dataSrcSet}" data-lazy-loaded="${
+                img.dataLazyLoaded
+              }" loading="${img.loading}" 
                   style="object-fit: cover" />
                 <div class="overlay position-relative bg-light">
                   <div class="mb-2" style="font-size: 13px">
@@ -100,26 +185,15 @@
                     <span class="px-1">/</span>
                     <span>${date}</span>
                   </div>
-                  <a class="h4 m-0" href="single.html?id=${id}">${title}</a>
+                  <a class="h4 m-0" href="single.php?id=${id}">${truncateWordsAndAddEllipsis(
+                title,
+                6
+              )}</a>
                 </div>
               </div>
               `
             );
           }
-        });
-
-        // Tranding carousel
-        $(".tranding-carousel").owlCarousel({
-          autoplay: true,
-          smartSpeed: 2000,
-          items: 1,
-          dots: false,
-          loop: true,
-          nav: true,
-          navText: [
-            '<i class="fa fa-angle-left"></i>',
-            '<i class="fa fa-angle-right"></i>',
-          ],
         });
 
         // Carousel item 1

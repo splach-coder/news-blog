@@ -1,9 +1,7 @@
 const id = getIdFromUrl();
 
-console.log(id);
-
 $.ajax({
-  url: "./data/data.json",
+  url: "../data/data.json",
   type: "GET",
   dataType: "json",
   success: function (data) {

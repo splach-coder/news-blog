@@ -35,6 +35,24 @@
     return false;
   });
 
+  $("#insert-email").on("click", function () {
+    const emailInput = $(this).parent().parent().find("input[type='email']");
+    const emailAddress = emailInput.val();
 
-
+    if (emailAddress) {
+      $.ajax({
+        url: "./mail/emails.php", // Replace with your PHP script URL
+        method: "POST",
+        data: {
+          email: emailAddress,
+        },
+        success: function (response) {
+          console.log(response);
+        },
+        error: function (error) {
+          console.error("Error appending email:", error);
+        },
+      });
+    }
+  });
 })(jQuery);

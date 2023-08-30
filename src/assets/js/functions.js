@@ -52,3 +52,22 @@ function findObjectById(data, id) {
   return data.jobs.find((item) => item.id === id);
 }
 
+function isArabic(text) {
+  // Regular expression to match Arabic characters
+  const arabicPattern = /[\u0600-\u06FF]/;
+  return arabicPattern.test(text);
+}
+
+function truncateWordsAndAddEllipsis(text, maxWords) {
+  const words = text.split(" ");
+
+  if (words.length <= maxWords) {
+    return text;
+  } else {
+    const truncatedText = words.slice(0, maxWords).join(" ");
+    if (isArabic(truncatedText)) {
+      return truncatedText + "...";
+    }
+    return truncatedText + "...";
+  }
+}

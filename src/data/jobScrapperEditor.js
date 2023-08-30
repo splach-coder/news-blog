@@ -29,7 +29,7 @@ function scrapeTextFromUrl(URL) {
 
 // Read the JSON data from data.json
 fs.readFile(
-  "C:/Users/anasb/Downloads/free-bootstrap-magazine-template/data/data.json",
+  "C:/xampp/htdocs/jobhub/src/data/data.json",
   "utf8",
   async (err, data) => {
     if (err) {
@@ -45,7 +45,7 @@ fs.readFile(
       if (obj.url != undefined) {
         await scrapeTextFromUrl(obj.url)
           .then((text) => {
-            const Text = filterHTML(text);
+            const Text = filterHTML(obj.url, text);
             obj.text = Text; // Output the scraped text
           })
           .catch((error) => {
@@ -66,33 +66,50 @@ fs.readFile(
   }
 );
 
-function filterHTML(htmlCode) {
+function filterHTML(url, htmlCode) {
   const cheerio = require("cheerio");
 
   // Load the HTML code using Cheerio
   const $ = cheerio.load(htmlCode);
 
-   // Filter p tags with span and strong elements
-   $("p[style*='text-align: justify;'] span").each((index, spanElement) => {
-    const span = $(spanElement);
-    
-    // Remove only the font-family style attribute
-    const currentStyle = span.attr('style');
-    const newStyle = currentStyle.replace(/font-family\s*:[^;]*;?/i, '');
+  $("p[style*='text-align: justify;']").each(function () {
+    const span = $(this).find("span").first();
 
-    span.attr('style', newStyle);
-
-    const strongTag = span.find('strong');
-    if (strongTag.length > 0) {
-      const content = strongTag.text().trim();
+    if (span.length > 0) {
+      const content = span.text().trim();
       const isArabicLang = isArabic(content);
-      
+
       // Set text-align based on language
-      const parentP = span.closest('p');
+      const parentP = $(this);
+      span.css({
+        "font-size": "16pt",
+      });
+
       if (isArabicLang) {
-        parentP.css('text-align', 'right');
+        parentP.css({
+          "text-align": "right",
+        });
       } else {
-        parentP.css('text-align', 'left');
+        parentP.css({
+          "text-align": "left",
+        });
+      }
+    } else {
+      const content = $(this).text().trim();
+      const isArabicLang = isArabic(content);
+
+      // Set text-align based on language
+      const parentP = $(this);
+      if (isArabicLang) {
+        parentP.css({
+          "text-align": "right",
+          "font-size": "16pt",
+        });
+      } else {
+        parentP.css({
+          "text-align": "left",
+          "font-size": "16pt",
+        });
       }
     }
   });
@@ -120,8 +137,21 @@ function filterHTML(htmlCode) {
     }
   });
 
+  $(".jeg_post_tags a").each(function () {
+    $(this).attr("href", "#");
+  });
+
+  const tags = tgs();
+  tags.forEach((element) => {
+    $(".jeg_post_tags").append(`
+        <a href="#" rel="tag"> ${element} </a>
+    `);
+  });
+
   // Remove divs with class "jeg_ad"
   $("div.jeg_ad").remove();
+
+  $("body").append(`<a href="${url}" class="source">Source</a>`);
 
   // Return the filtered HTML code
   return $.html();
@@ -131,4 +161,21 @@ function isArabic(text) {
   // Regular expression to match Arabic characters
   const arabicPattern = /[\u0600-\u06FF]/;
   return arabicPattern.test(text);
+}
+
+function tgs() {
+  const tags = [
+    "emploi public",
+    "offres d'emploi",
+    "place emploi public gouv",
+    "concours d'emploi",
+    "الوظيفة العمومية نيفو باك",
+    "الوظيفة العمومية المغرب ",
+    "مباريات التوظيف ",
+    "مستجدات الوظيفة ",
+    "maroc emploi public",
+    "depot emploi public",
+  ];
+
+  return tags;
 }
